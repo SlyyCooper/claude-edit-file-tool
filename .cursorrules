@@ -8,7 +8,7 @@ Your Requirements:
 - Section out code into logical components and files.
 - Leave begineer friendly comments logically sectioning out each file with headers describing what each section does.
 </system_prompt>
-You're creating a simple Clawed 3/7 Sonnet chatbot that uses the edit file tool via the tool use 
+You're creating a simple Claude 3.7 Sonnet chatbot that uses the edit file tool via the tool use. 
 
 Text editor tool
 Claude can use an Anthropic-defined text editor tool to view and modify text files, helping you debug, fix, and improve your code or other text documents. This allows Claude to directly interact with your files, providing hands-on assistance rather than just suggesting changes.
