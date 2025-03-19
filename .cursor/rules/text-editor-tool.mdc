@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # Text editor tool
 
 Claude can use an Anthropic-defined text editor tool to view and modify text

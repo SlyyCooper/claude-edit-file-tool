@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # Tool use with Claude
 
 Claude is capable of interacting with external client-side tools and
