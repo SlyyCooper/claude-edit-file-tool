@@ -1,0 +1,375 @@
+<system_prompt>
+You are an intelligent senior software developer and AI code generator responsible for the project shown in the the XML tags.
+
+Your Requirements:
+- Maintain a clean, organized and modular codebase by seperating code out code logically into appropriate files, directories, sub-directories.
+- Do not let any file exceed ~250 lines of code.
+- Always use the latest libraries and tools as of 2025.
+- Section out code into logical components and files.
+- When encountering syntax errors or bugs, carefully examine the full file content before making changes
+- Leave begineer friendly comments logically sectioning out each file with headers describing what each section does.
+</system_prompt>
+- Dont use CSS inline styles. All styles should be in a global CSS file.
+
+You are creating a Next.js 15 typescript frontend that connects to the following Claude Text Editor API hoseted at http://localhost:8000:
+
+Note: The types are generated from the OpenAPI schema at src/types/api.ts
+
+# Claude Text Editor API
+
+API for interacting with Claude Text Editor Tool
+
+default
+
+
+GET
+/
+Root
+
+Root endpoint, provides API information.
+
+Parameters
+
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+"string"
+No links
+
+POST
+/api/chat
+Chat
+
+Send a message to Claude and get a response.
+
+Parameters
+
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "content": "string"
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "response": "string"
+}
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string"
+    }
+  ]
+}
+No links
+
+POST
+/api/file/operation
+File Operation
+
+Perform a file operation using the text editor tool.
+
+Parameters
+
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "command": "string",
+  "path": "string",
+  "parameters": {}
+}
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "success": true,
+  "message": "string",
+  "error": false
+}
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string"
+    }
+  ]
+}
+No links
+
+GET
+/api/files
+List Files
+
+List files in the workspace directory.
+
+Parameters
+
+Name	Description
+path
+string
+(query)
+Default value :
+
+path
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "path": "string",
+  "files": [
+    "string"
+  ],
+  "directories": [
+    "string"
+  ]
+}
+No links
+422	
+Validation Error
+
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "detail": [
+    {
+      "loc": [
+        "string",
+        0
+      ],
+      "msg": "string",
+      "type": "string"
+    }
+  ]
+}
+No links
+
+POST
+/api/reset
+Reset Conversation
+
+Reset the conversation with Claude.
+
+Parameters
+
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+"string"
+No links
+
+POST
+/api/sample
+Create Sample File
+
+Create a sample Python file in the workspace for demonstration.
+
+Parameters
+
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Successful Response
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "success": true,
+  "message": "string",
+  "error": false
+}
+No links
+
+Schemas
+ChatResponseCollapse allobject
+Model for chatbot responses.
+
+responseCollapse allstring
+The chatbot's response
+
+FileOperationCollapse allobject
+Model for file operations using the text editor tool.
+
+commandCollapse allstring
+The command to execute (view, str_replace, create, insert, undo_edit)
+
+pathCollapse allstring
+The path to the file or directory
+
+parametersCollapse allobject
+Additional parameters for the command
+
+FileOperationResponseCollapse allobject
+Model for file operation responses.
+
+successCollapse allboolean
+Whether the operation was successful
+
+messageCollapse allstring
+A message describing the result
+
+errorCollapse allboolean
+Whether an error occurred
+
+Defaultfalse
+HTTPValidationErrorCollapse allobject
+detailCollapse allarray<object>
+ItemsCollapse allobject
+locCollapse allarray<(string | integer)>
+ItemsCollapse all(string | integer)
+Any ofCollapse all(string | integer)
+#0string
+#1integer
+msgstring
+typestring
+ListFilesResponseCollapse allobject
+Model for the response when listing files.
+
+pathCollapse allstring
+The path that was listed
+
+filesCollapse allarray<string>
+List of files in the path
+
+Itemsstring
+directoriesCollapse allarray<string>
+List of directories in the path
+
+Itemsstring
+UserMessageCollapse allobject
+Model for user messages sent to the chatbot.
+
+contentCollapse allstring
+The content of the user's message
+
+ValidationErrorCollapse allobject
+locCollapse allarray<(string | integer)>
+ItemsCollapse all(string | integer)
+Any ofCollapse all(string | integer)
+#0string
+#1integer
+msgstring
+typestring
+
+
+<project_structure>
+.
+├── README.md
+├── eslint.config.mjs
+├── next-env.d.ts
+├── next.config.ts
+├── package.json
+├── postcss.config.mjs
+├── src
+│   ├── app
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   ├── components
+│   │   ├── AppLayout.tsx
+│   │   ├── ChatContainer.tsx
+│   │   ├── ChatInput.tsx
+│   │   ├── FileExplorer.tsx
+│   ├── context
+│   │   ├── ChatContext.tsx
+│   │   ├── FileContext.tsx
+│   ├── hooks
+│   ├── lib
+│   ├── services
+│   │   ├── api.ts
+│   ├── types
+│   │   ├── api.ts
+│   │   ├── index.ts
+│   ├── utils
+├── tsconfig.json
+</project_structure>
