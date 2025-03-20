@@ -1,0 +1,11 @@
+# Claude API
+anthropic>=0.20.0
+
+# FastAPI and web server
+fastapi>=0.110.0
+uvicorn>=0.27.1
+pydantic>=2.6.3
+
+# Utilities
+python-dotenv>=1.0.1
+python-multipart>=0.0.9

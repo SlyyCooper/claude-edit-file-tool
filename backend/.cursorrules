@@ -6,11 +6,312 @@ Your Requirements:
 - Do not let any file exceed ~250 lines of code.
 - Always use the latest libraries and tools as of 2025.
 - Section out code into logical components and files.
+- When encountering syntax errors or bugs, carefully examine the full file content before making changes
 - Leave begineer friendly comments logically sectioning out each file with headers describing what each section does.
 </system_prompt>
 You're creating a simple Claude 3.7 Sonnet chatbot that uses the edit file tool via the tool use. 
 
-Text editor tool
+# Claude Text Editor Assistant
+
+You are an expert Python developer specializing in text editor tools for the Claude 3.7 Sonnet AI assistant. It is the year 2025, and you're developing a command-line interface application that enables users to interact with Claude to view, edit, and create text files through the powerful text editor tool functionality.
+
+```
+# Your Requirements:
+
+1. ALWAYS use the Claude 3.7 Sonnet model with the text editor tool 'text_editor_20250124' when code involves file operations
+2. NEVER attempt to use any other model for file editing capabilities
+3. When encountering syntax errors or bugs, carefully examine the full file content before making changes
+4. Always create backups before modifying files to prevent data loss
+5. Ensure all file paths are properly validated to prevent directory traversal attacks
+6. Use descriptive error messages that help users understand issues
+7. Maintain consistent code style following established patterns in the codebase
+8. Document all changes made to files with clear explanations of what was fixed and why
+9. When creating new files, ensure proper directory structures exist
+10. Prefer precise text replacement with exact matches over line-based replacements when possible
+```
+
+# Text Editor Tool Functionality
+
+The Claude text editor tool enables direct file interaction through five key commands:
+
+## Command: 'view'
+
+Used to examine file contents or list directory contents.
+
+```python
+{
+  "type": "tool_use",
+  "id": "toolu_01A09q90qw90lq917835lq9",
+  "name": "str_replace_editor",
+  "input": {
+    "command": "view",
+    "path": "src/main.py"
+  }
+}
+```
+
+Parameters:
+- `command`: Must be "view"
+- `path`: Path to file or directory
+- `view_range` (optional): Array of two integers [start, end] specifying line range
+
+## Command: 'str_replace'
+
+Used for precise text replacement with exact matching.
+
+```python
+{
+  "type": "tool_use",
+  "id": "toolu_01A09q90qw90lq917835lq9",
+  "name": "str_replace_editor",
+  "input": {
+    "command": "str_replace",
+    "path": "sample.py",
+    "old_str": "else\n        return n * calculate_factorial(n - 1)",
+    "new_str": "else:\n        return n * calculate_factorial(n - 1)"
+  }
+}
+```
+
+Parameters:
+- `command`: Must be "str_replace"
+- `path`: Path to file
+- `old_str`: Text to replace (must match exactly with whitespace/indentation)
+- `new_str`: New text to insert
+
+## Command: 'create'
+
+Used to create new files with specified content.
+
+```python
+{
+  "type": "tool_use",
+  "id": "toolu_01A09q90qw90lq917835lq9",
+  "name": "str_replace_editor",
+  "input": {
+    "command": "create",
+    "path": "tests/test_sample.py",
+    "file_text": "import unittest\nfrom src.sample import calculate_factorial\n\nclass TestFactorial(unittest.TestCase):\n    def test_factorial(self):\n        self.assertEqual(calculate_factorial(5), 120)\n\nif __name__ == '__main__':\n    unittest.main()"
+  }
+}
+```
+
+Parameters:
+- `command`: Must be "create"
+- `path`: Path for new file
+- `file_text`: Content for the file
+
+## Command: 'insert'
+
+Used to insert text at specific line numbers.
+
+```python
+{
+  "type": "tool_use",
+  "id": "toolu_01A09q90qw90lq917835lq9",
+  "name": "str_replace_editor",
+  "input": {
+    "command": "insert",
+    "path": "sample.py",
+    "insert_line": 0,
+    "new_str": "#!/usr/bin/env python3\n\"\"\"\nFactorial calculation module.\n\nProvides functions for calculating factorials of numbers.\n\"\"\"\n"
+  }
+}
+```
+
+Parameters:
+- `command`: Must be "insert"
+- `path`: Path to file
+- `insert_line`: Line number after which to insert (0 for beginning)
+- `new_str`: Text to insert
+
+## Command: 'undo_edit'
+
+Used to revert the last edit by restoring from backup.
+
+```python
+{
+  "type": "tool_use",
+  "id": "toolu_01A09q90qw90lq917835lq9",
+  "name": "str_replace_editor",
+  "input": {
+    "command": "undo_edit",
+    "path": "sample.py"
+  }
+}
+```
+
+Parameters:
+- `command`: Must be "undo_edit"
+- `path`: Path to file to restore
+
+# Application Architecture
+
+## Main Components
+
+The application consists of these primary components:
+
+1. **main.py**: Entry point providing CLI interface with commands:
+   - `/help`: Display help information
+   - `/clear`: Clear the screen
+   - `/reset`: Reset the conversation
+   - `/sample`: Create a sample Python file
+   - `/workspace`: Show workspace directory
+   - `/exit`: Exit the application
+   - `/list`: List files in workspace
+
+2. **ClaudeTextEditorChatbot**: Core class managing:
+   - Conversation history
+   - Tool use detection and execution
+   - Response processing
+   - Error handling
+
+3. **TextEditorTool**: Tool implementation handling:
+   - Command processing
+   - File operations
+   - Error reporting
+   - Result formatting
+
+4. **File Utilities**: Security-focused utilities for:
+   - Path validation
+   - Automatic backups
+   - Safe file operations
+   - Directory management
+
+## Workflow Process
+
+1. User enters a message requesting file examination or modification
+2. Message is sent to Claude through the Anthropic API
+3. Claude analyzes the request and determines needed file operations
+4. Claude returns a response with `tool_use` blocks
+5. Application extracts command parameters and executes operations
+6. Results are returned to Claude as `tool_result` blocks
+7. Claude provides a final response explaining changes made
+
+# Implementation Patterns
+
+## Path Validation
+
+Always validate file paths to prevent security issues:
+
+```python
+def validate_path(path: str) -> Tuple[bool, str, Optional[str]]:
+    # Normalize the path
+    if os.path.isabs(path):
+        abs_path = os.path.normpath(path)
+    else:
+        abs_path = os.path.normpath(os.path.join(WORKSPACE_DIR, path))
+    
+    # Check if the path is within the allowed directory
+    if not abs_path.startswith(WORKSPACE_DIR):
+        return False, abs_path, f"Access denied: Path must be within the workspace directory"
+    
+    # Check file extension
+    if os.path.isfile(abs_path) or not os.path.exists(abs_path):
+        file_ext = os.path.splitext(abs_path)[1].lower()
+        if file_ext and file_ext not in ALLOWED_EXTENSIONS:
+            return False, abs_path, f"Access denied: File extension '{file_ext}' is not allowed"
+    
+    return True, abs_path, None
+```
+
+## Backup Creation
+
+Always create backups before file modifications:
+
+```python
+def create_backup(file_path: str) -> Optional[str]:
+    if not os.path.exists(file_path):
+        return None
+        
+    try:
+        # Create unique backup filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        unique_id = str(uuid.uuid4())[:8]
+        file_name = os.path.basename(file_path)
+        backup_file = os.path.join(BACKUP_DIR, f"{file_name}.{timestamp}.{unique_id}.bak")
+        
+        # Copy the file
+        shutil.copy2(file_path, backup_file)
+        return backup_file
+    except Exception as e:
+        print(f"Error creating backup: {str(e)}")
+        return None
+```
+
+## Text Replacement Validation
+
+Ensure exactly one match when replacing text:
+
+```python
+def replace_text_in_file(file_path: str, old_str: str, new_str: str) -> Tuple[bool, str]:
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        # Check match count
+        match_count = content.count(old_str)
+        
+        if match_count == 0:
+            return False, "Error: No match found for replacement text"
+        elif match_count > 1:
+            return False, f"Error: Found {match_count} matches for replacement text"
+            
+        # Create backup and perform replacement
+        backup_path = create_backup(file_path)
+        new_content = content.replace(old_str, new_str)
+        
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+            
+        return True, f"Successfully replaced text. Backup created at {os.path.basename(backup_path)}."
+    except Exception as e:
+        return False, f"Error replacing text: {str(e)}"
+```
+
+# Error Handling Strategies
+
+## File Not Found
+
+Return clear error messages when files aren't found:
+
+```json
+{
+  "type": "tool_result",
+  "tool_use_id": "toolu_01A09q90qw90lq917835lq9",
+  "content": "Error: File not found: path/to/file.py",
+  "is_error": true
+}
+```
+
+## Multiple Match Errors
+
+Provide context when text replacement isn't unique:
+
+```json
+{
+  "type": "tool_result", 
+  "tool_use_id": "toolu_01A09q90qw90lq917835lq9",
+  "content": "Error: Found 3 matches for replacement text. Please provide more context for a unique match.",
+  "is_error": true
+}
+```
+
+## Permission Errors
+
+Handle access restriction errors appropriately:
+
+```json
+{
+  "type": "tool_result",
+  "tool_use_id": "toolu_01A09q90qw90lq917835lq9",
+  "content": "Error: Permission denied. Cannot write to file.",
+  "is_error": true
+}
+```
+
+# Text editor tool Documentation
+
 Claude can use an Anthropic-defined text editor tool to view and modify text files, helping you debug, fix, and improve your code or other text documents. This allows Claude to directly interact with your files, providing hands-on assistance rather than just suggesting changes.
 
 ​
@@ -653,26 +954,107 @@ Account for the additional token usage for all tools included in your request
 For more information about using the text editor tool in a computer use context, see the Computer use.
 
 ​
-Change log
-Date	Version	Changes
-March 13, 2025	text_editor_20250124	Introduction of standalone Text Editor Tool documentation. This version is optimized for Claude 3.7 Sonnet but has identical capabilities to the previous version.
-October 22, 2024	text_editor_20241022	Initial release of the Text Editor Tool with Claude 3.5 Sonnet. Provides capabilities for viewing, creating, and editing files through the view, create, str_replace, insert, and undo_edit commands.
-​
 
+## Streaming responses
+
+We provide support for streaming responses using Server Side Events (SSE).
+
+```python
+from anthropic import Anthropic
+
+client = Anthropic()
+
+stream = client.messages.create(
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": "Hello, Claude",
+        }
+    ],
+    model="claude-3-5-sonnet-latest",
+    stream=True,
+)
+for event in stream:
+    print(event.type)
+```
+
+The async client uses the exact same interface.
+
+```python
+from anthropic import AsyncAnthropic
+
+client = AsyncAnthropic()
+
+stream = await client.messages.create(
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": "Hello, Claude",
+        }
+    ],
+    model="claude-3-5-sonnet-latest",
+    stream=True,
+)
+async for event in stream:
+    print(event.type)
+```
+
+### Streaming Helpers
+
+This library provides several conveniences for streaming messages, for example:
+
+```py
+import asyncio
+from anthropic import AsyncAnthropic
+
+client = AsyncAnthropic()
+
+async def main() -> None:
+    async with client.messages.stream(
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": "Say hello there!",
+            }
+        ],
+        model="claude-3-7-sonnet-latest",
+    ) as stream:
+        async for text in stream.text_stream:
+            print(text, end="", flush=True)
+        print()
+
+    message = await stream.get_final_message()
+    print(message.to_json())
+
+asyncio.run(main())
+```
+
+Streaming with `client.messages.stream(...)` exposes [various helpers for your convenience](helpers.md) including accumulation & SDK-specific events.
+
+Alternatively, you can use `client.messages.create(..., stream=True)` which only returns an async iterable of the events in the stream and thus uses less memory (it does not build up a final message object for you).
 
 <project_structure>
 .
 ├── .env
-├── output
-│   ├── Text editor tool.md
-│   ├── Tool-Use.md
+├── README.md
+├── main.py
+├── requirements.txt
 ├── src
+│   ├── __init__.py
 │   ├── chatbot.py
 │   ├── config
+│   │   ├── __init__.py
 │   │   ├── settings.py
 │   ├── tools
+│   │   ├── __init__.py
 │   │   ├── text_editor.py
 │   ├── utils
+│   │   ├── __init__.py
 │   │   ├── file_utils.py
 ├── workspace
+│   ├── .backups
+│   ├── test.txt
 </project_structure>

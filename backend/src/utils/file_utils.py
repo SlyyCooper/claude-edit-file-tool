@@ -11,6 +11,10 @@ from typing import List, Optional, Tuple, Union
 
 from src.config.settings import WORKSPACE_DIR, BACKUP_DIR, ALLOWED_EXTENSIONS
 
+# --------------------------------------------------
+# --- Path Validation Functions
+# --------------------------------------------------
+
 def validate_path(path: str) -> Tuple[bool, str, Optional[str]]:
     """
     Validate that a path is within the allowed workspace directory and has allowed extension.
@@ -38,6 +42,10 @@ def validate_path(path: str) -> Tuple[bool, str, Optional[str]]:
             return False, abs_path, f"Access denied: File extension '{file_ext}' is not allowed"
     
     return True, abs_path, None
+
+# --------------------------------------------------
+# --- Backup and Restore Functions
+# --------------------------------------------------
 
 def create_backup(file_path: str) -> Optional[str]:
     """
@@ -89,6 +97,10 @@ def get_most_recent_backup(file_path: str) -> Optional[str]:
     backup_files.sort(key=lambda x: os.path.getctime(x), reverse=True)
     return backup_files[0]
 
+# --------------------------------------------------
+# --- Directory Listing Functions
+# --------------------------------------------------
+
 def list_directory_contents(directory_path: str) -> List[str]:
     """
     List the contents of a directory with [FILE] and [DIR] prefixes.
@@ -112,6 +124,10 @@ def list_directory_contents(directory_path: str) -> List[str]:
         contents.append(f"{prefix} {item}")
     
     return contents
+
+# --------------------------------------------------
+# --- File Reading Functions
+# --------------------------------------------------
 
 def read_file_with_line_numbers(file_path: str, view_range: Optional[List[int]] = None) -> str:
     """
@@ -144,6 +160,10 @@ def read_file_with_line_numbers(file_path: str, view_range: Optional[List[int]] 
         return ''.join(numbered_lines)
     except Exception as e:
         return f"Error reading file: {str(e)}"
+
+# --------------------------------------------------
+# --- File Modification Functions
+# --------------------------------------------------
 
 def replace_text_in_file(file_path: str, old_str: str, new_str: str) -> Tuple[bool, str]:
     """
@@ -232,6 +252,10 @@ def insert_text_at_line(file_path: str, insert_line: int, new_str: str) -> Tuple
     except Exception as e:
         return False, f"Error inserting text: {str(e)}"
 
+# --------------------------------------------------
+# --- File Creation Functions
+# --------------------------------------------------
+
 def create_new_file(file_path: str, file_text: str) -> Tuple[bool, str]:
     """
     Create a new file with the specified content.
@@ -260,6 +284,10 @@ def create_new_file(file_path: str, file_text: str) -> Tuple[bool, str]:
         return True, f"Successfully created file: {file_path}"
     except Exception as e:
         return False, f"Error creating file: {str(e)}"
+
+# --------------------------------------------------
+# --- File Restoration Functions
+# --------------------------------------------------
 
 def restore_from_backup(file_path: str) -> Tuple[bool, str]:
     """

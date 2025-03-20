@@ -15,9 +15,15 @@ from src.utils.file_utils import (
     restore_from_backup
 )
 
+# =========================================================================
+#  TextEditorTool Class
+# =========================================================================
 class TextEditorTool:
     """Tool for Claude to view and modify text files."""
     
+    # =========================================================================
+    #  Handle Tool Use
+    # =========================================================================
     @staticmethod
     def handle_tool_use(tool_use) -> Dict[str, Any]:
         """
@@ -99,7 +105,9 @@ class TextEditorTool:
             "content": result["content"],
             "is_error": result["is_error"]
         }
-        
+    # =========================================================================
+    #  Handle 'view' Command
+    # =========================================================================    
     @staticmethod
     def _handle_view(path: str, view_range: Optional[List[int]]) -> Dict[str, Union[str, bool]]:
         """Handle the 'view' command."""
@@ -126,7 +134,9 @@ class TextEditorTool:
                 "content": f"Error: Path not found: {path}",
                 "is_error": True
             }
-            
+    # =========================================================================
+    #  Handle 'str_replace' Command
+    # =========================================================================        
     @staticmethod
     def _handle_str_replace(path: str, old_str: str, new_str: str) -> Dict[str, Union[str, bool]]:
         """Handle the 'str_replace' command."""
@@ -147,7 +157,9 @@ class TextEditorTool:
             "content": message,
             "is_error": not success
         }
-        
+    # =========================================================================
+    #  Handle 'create' Command
+    # =========================================================================    
     @staticmethod
     def _handle_create(path: str, file_text: str) -> Dict[str, Union[str, bool]]:
         """Handle the 'create' command."""
@@ -157,6 +169,9 @@ class TextEditorTool:
             "is_error": not success
         }
         
+    # =========================================================================
+    #  Handle 'insert' Command
+    # =========================================================================    
     @staticmethod
     def _handle_insert(path: str, insert_line: int, new_str: str) -> Dict[str, Union[str, bool]]:
         """Handle the 'insert' command."""
@@ -165,7 +180,9 @@ class TextEditorTool:
             "content": message,
             "is_error": not success
         }
-        
+    # =========================================================================
+    #  Handle 'undo_edit' Command
+    # =========================================================================        
     @staticmethod
     def _handle_undo_edit(path: str) -> Dict[str, Union[str, bool]]:
         """Handle the 'undo_edit' command."""

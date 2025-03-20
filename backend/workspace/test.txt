@@ -1,0 +1,4 @@
+This is a simple test file.
+It contains a few lines of text.
+Created to verify tool functionality.
+Thank you for testing!

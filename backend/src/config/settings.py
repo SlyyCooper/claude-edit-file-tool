@@ -5,24 +5,44 @@ Configuration settings for the Claude Text Editor Chatbot application.
 import os
 from dotenv import load_dotenv
 
+# ----------------------------------------------------------------------
+# --- Environment Variable Loading
+# ----------------------------------------------------------------------
+
 # Load environment variables from .env file
 load_dotenv()
+
+# ----------------------------------------------------------------------
+# --- API Configuration
+# ----------------------------------------------------------------------
 
 # API configuration
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 MODEL_NAME = "claude-3-7-sonnet-20250219"
 MAX_TOKENS = 4096
 
+# ----------------------------------------------------------------------
+# --- File System Configuration
+# ----------------------------------------------------------------------
+
 # File system configuration
 WORKSPACE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "workspace"))
 BACKUP_DIR = os.path.join(WORKSPACE_DIR, ".backups")
 os.makedirs(BACKUP_DIR, exist_ok=True)
+
+# ----------------------------------------------------------------------
+# --- Security Settings
+# ----------------------------------------------------------------------
 
 # Security settings
 ALLOWED_EXTENSIONS = {
     ".py", ".txt", ".md", ".json", ".yaml", ".yml", 
     ".html", ".css", ".js", ".ts", ".jsx", ".tsx"
 }
+
+# ----------------------------------------------------------------------
+# --- Tool Definitions
+# ----------------------------------------------------------------------
 
 # Tool definitions
 TEXT_EDITOR_TOOL_DEFINITION = {
